@@ -91,7 +91,7 @@ export class SceneWorld extends Phaser.Scene {
 
     //    this.cameras.main.setZoom(0.7);
 
-    const controlConfig = {
+    /*const controlConfig = {
       camera: this.cameras.main,
       left: this.cursors.left,
       right: this.cursors.right,
@@ -100,7 +100,7 @@ export class SceneWorld extends Phaser.Scene {
       acceleration: 0.04,
       drag: 0.0005,
       maxSpeed: 0.7,
-    };
+    };*/
 
     /*this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(
       controlConfig
@@ -152,7 +152,7 @@ export class SceneWorld extends Phaser.Scene {
       color;
   }
 
-  update(_time: number, delta: number) {
+  update(_time: number) {
     //    this.controls.update(delta);
 
     if (Phaser.Input.Keyboard.JustDown(this.cursors.space)) {
