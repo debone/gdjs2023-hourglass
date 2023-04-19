@@ -4,7 +4,7 @@ import PhaserGamebus from "../gamebus";
 
 import Phaser, { Display } from "phaser";
 import { Map } from "../systems/map";
-import { RESOURCES } from "./main";
+//import { RESOURCES } from "./main";
 import { Player } from "../entities/player";
 
 type Color = Display.Color;
@@ -13,10 +13,10 @@ const Color = Display.Color;
 export const tileSizeWidth = 64;
 export const tileSizeHeight = 32;
 
-export const worldSize = 256;
+export const worldSize = 512;
 
 export const playerStartX = 95;
-export const playerStartY = 135;
+export const playerStartY = 35;
 
 export class SceneWorld extends Phaser.Scene {
   declare controls: Phaser.Cameras.Controls.SmoothedKeyControl;
@@ -39,7 +39,7 @@ export class SceneWorld extends Phaser.Scene {
     graphics: Phaser.GameObjects.Graphics
   ) {
     // this.floorLayer?
-    const worldCoord = this.map.tileToWorld(x, y);
+    const worldCoord = this.map.map.tileToWorldXY(x, y)!;
     //const tileAt = this.map.getTile(x, y);
 
     // Snap to tile coordinates, but in world space
@@ -47,13 +47,13 @@ export class SceneWorld extends Phaser.Scene {
     let ty = worldCoord.y;
 
     graphics.lineStyle(7, color.color, 1);
-    graphics.translateCanvas(tx, ty);
+    graphics.translateCanvas(tx, ty + tileSizeHeight);
     graphics.beginPath();
-    graphics.moveTo(0, 0);
-    graphics.lineTo(tileSizeWidth / 2, tileSizeHeight / 2);
-    graphics.lineTo(0, tileSizeHeight);
-    graphics.lineTo(-tileSizeWidth / 2, tileSizeHeight / 2);
-    graphics.lineTo(0, 0);
+    graphics.moveTo(tileSizeWidth / 2, 0);
+    graphics.lineTo(tileSizeWidth, tileSizeHeight / 2);
+    graphics.lineTo(tileSizeWidth / 2, tileSizeHeight);
+    graphics.lineTo(0, tileSizeHeight / 2);
+    graphics.lineTo(tileSizeWidth / 2, 0);
     graphics.closePath();
     graphics.strokePath();
   }
@@ -89,7 +89,7 @@ export class SceneWorld extends Phaser.Scene {
 
     this.cursors = this.input.keyboard!.createCursorKeys();
 
-    //    this.cameras.main.setZoom(0.7);
+    //this.cameras.main.setZoom(0.1);
 
     /*const controlConfig = {
       camera: this.cameras.main,
@@ -117,16 +117,10 @@ export class SceneWorld extends Phaser.Scene {
   declare playerStart: Phaser.Math.Vector2;
 
   createGame() {
-    this.map = new Map(this.cameras.main, tileSizeWidth, tileSizeHeight);
+    this.map = new Map(this, tileSizeWidth, tileSizeHeight);
 
-    this.playerStart = this.map.tileToWorld(playerStartX, playerStartY);
+    this.playerStart = this.map.map.tileToWorldXY(playerStartX, playerStartY)!;
     //this.cameras.main.centerOn(this.playerStart.x, this.playerStart.y);
-
-    for (let x = 0; x < worldSize; x++) {
-      for (let y = 0; y < worldSize; y++) {
-        this.drawIsoTile(x, y, 0xffff00 - 10000 * this.map.getTile(x, y));
-      }
-    }
 
     this.player = new Player(
       this,
@@ -142,14 +136,6 @@ export class SceneWorld extends Phaser.Scene {
     this.marker = this.add.graphics();
     //this.player.body?.drawDebug(this.marker);
     this.drawMark(7, 7, Color.RandomRGB(), this.marker);
-  }
-
-  // Function that draws an isometric tile at the given position
-  drawIsoTile(tileX: number, tileY: number, color: number) {
-    const { x, y } = this.map.tileToWorld(tileX, tileY);
-
-    this.add.sprite(x, y + tileSizeHeight / 2, RESOURCES.TEST_TILE).tint =
-      color;
   }
 
   update(_time: number) {
@@ -179,9 +165,10 @@ export class SceneWorld extends Phaser.Scene {
       this.cameras.main
     ) as Phaser.Math.Vector2;
 
-    const pointerTile = this.map.worldToTile(
+    const pointerTile = this.map.map.worldToTileXY(
       worldPoint.x,
-      worldPoint.y //- this.map.tileWidth / 2,
+      worldPoint.y, //- this.map.tileWidth / 2,,
+      true
     );
 
     //    console.log(this.map.getTileAt(pointerTile.x, pointerTile.y));
@@ -206,7 +193,10 @@ export class SceneWorld extends Phaser.Scene {
       this.params.tileCoord.y = pointerTile.y;
       this.params.worldCoord.x = worldPoint.x;
       this.params.worldCoord.y = worldPoint.y;
-      this.params.tile = this.map.getTile(pointerTile.x, pointerTile.y);
+      this.params.tile = this.map.map.getTileAt(
+        Math.floor(pointerTile.x),
+        Math.floor(pointerTile.y)
+      );
 
       this.params.water = this.player.water;
       this.params.stamina = this.player.stamina;
