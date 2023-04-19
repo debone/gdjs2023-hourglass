@@ -2,11 +2,20 @@ import Phaser from "phaser";
 
 import testTile from "../assets/test-tile.png?url";
 import testChar from "../assets/test-char.png?url";
+import testDune from "../assets/test-dune.png?url";
 
 export const RESOURCES = {
   TEST_TILE: "test-tile",
   TEST_CHAR: "test-char",
-};
+  TEST_DUNE: "test-dune",
+} as const;
+
+export const RESOURCES_INDEX = Object.keys(RESOURCES).reduce(
+  (acc, key, index) => ({ ...acc, [key]: index }),
+  {} as Record<keyof typeof RESOURCES, number>
+);
+
+export const RESOURCES_LIST = Object.values(RESOURCES);
 
 export class SceneMain extends Phaser.Scene {
   declare keySpace: Phaser.Input.Keyboard.Key;
@@ -18,6 +27,7 @@ export class SceneMain extends Phaser.Scene {
   preload() {
     this.load.image(RESOURCES.TEST_TILE, testTile);
     this.load.image(RESOURCES.TEST_CHAR, testChar);
+    this.load.image(RESOURCES.TEST_DUNE, testDune);
   }
 
   create() {

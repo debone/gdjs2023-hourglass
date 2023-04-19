@@ -1,30 +1,29 @@
 import Phaser from "phaser";
 import {
   SceneWorld,
+  playerStartX,
+  playerStartY,
   tileSizeHeight,
   tileSizeWidth,
   worldSize,
 } from "../scenes/world";
 
 //import Perlin from "phaser3-rex-plugins/plugins/perlin.js";
-import { RESOURCES } from "../scenes/main";
+import { RESOURCES } from "../scenes/preload";
 
-export class Map {
+export class MapSystem {
   tileWidth = tileSizeWidth;
   tileHeight = tileSizeHeight;
 
   map: Phaser.Tilemaps.Tilemap;
   mapData: Phaser.Tilemaps.MapData;
 
-  constructor(scene: SceneWorld, tileWidth: number, tileHeight: number) {
-    this.tileWidth = tileWidth;
-    this.tileHeight = tileHeight;
-
+  constructor(scene: SceneWorld) {
     this.mapData = new Phaser.Tilemaps.MapData({
       width: worldSize,
       height: worldSize,
-      tileWidth: tileSizeWidth,
-      tileHeight: tileSizeHeight,
+      tileWidth: this.tileWidth,
+      tileHeight: this.tileHeight,
       orientation: Phaser.Tilemaps.Orientation.ISOMETRIC,
       format: Phaser.Tilemaps.Formats.ARRAY_2D,
     });
@@ -39,6 +38,10 @@ export class Map {
     const layer = this.map.createBlankLayer("layer", tileset!, 0, 0);
 
     layer?.fill(0, 0, 0, worldSize, worldSize);
+
+    const { x, y } = layer?.tileToWorldXY(playerStartX + 7, playerStartY)!;
+
+    scene.add.image(x, y, RESOURCES.TEST_DUNE);
 
     //this.generateMap(worldSize, 50);
 

@@ -2,9 +2,9 @@ import "./style.css";
 
 import Phaser from "phaser";
 
-import { SceneMain } from "./scenes/main";
-
+import { SceneMain } from "./scenes/preload";
 import { SceneWorld } from "./scenes/world";
+import { SceneDebug } from "./scenes/debug";
 
 import { GAME_CONFIG } from "./consts";
 import PhaserGamebus from "./gamebus";
@@ -21,7 +21,7 @@ export const config = {
       },
     ],
   },
-  scene: [SceneMain, SceneWorld],
+  scene: [SceneMain, SceneWorld, SceneDebug],
 };
 
 new Phaser.Game(config);

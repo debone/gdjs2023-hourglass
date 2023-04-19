@@ -1,9 +1,14 @@
-import { RESOURCES } from "../scenes/main";
+import { addEntity } from "bitecs";
+import { RESOURCES, RESOURCES_INDEX } from "../scenes/preload";
 import { SceneWorld } from "../scenes/world";
+import { addComponent } from "bitecs";
+import Position from "../components/Position";
+import ArcadeSprite from "../components/ArcadeSprite";
+import { arcadeSpriteById } from "../systems/ArcadeSpriteSystem";
+import KeyboardControl from "../components/KeyboardControl";
 
-export class Player extends Phaser.Physics.Arcade.Sprite {
-  declare posX: number;
-  declare posY: number;
+export class Player {
+  declare id: number;
 
   declare maxWater: number;
   declare water: number;
@@ -16,28 +21,28 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   declare sceneWorld: SceneWorld;
 
-  constructor(
-    scene: SceneWorld,
-    x: number,
-    y: number,
-    posX: number,
-    posY: number
-  ) {
-    super(scene, x, y, RESOURCES.TEST_CHAR);
-    scene.physics.add.existing(this);
-    scene.add.existing(this);
-    this.posX = posX;
-    this.posY = posY;
+  constructor(scene: SceneWorld, posX: number, posY: number) {
+    this.id = addEntity(scene.world);
 
-    this.sceneWorld = scene;
+    addComponent(scene.world, KeyboardControl, this.id);
 
-    this.setOrigin(0, 0.75);
+    addComponent(scene.world, ArcadeSprite, this.id);
 
-    this.maxWater = 10;
+    ArcadeSprite.texture[this.id] = RESOURCES_INDEX.TEST_CHAR;
+
+    scene.arcadeSpriteSystem(scene.world);
+
+    const { x, y } = scene.map.map.tileToWorldXY(posX, posY)!;
+
+    arcadeSpriteById.get(this.id)!.setPosition(x, y);
+
+    //    this.sceneWorld = scene;
+
+    /*    this.maxWater = 10;
     this.water = 10;
 
     this.maxStamina = 10;
-    this.stamina = 10;
+    this.stamina = 10;*/
 
     //this.playerPos = new Phaser.Math.Vector2(x, y);
   }

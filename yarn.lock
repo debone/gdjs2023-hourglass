@@ -238,6 +238,11 @@ asynckit@^0.4.0:
   resolved "https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz"
   integrity sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==
 
+bitecs@^0.3.38:
+  version "0.3.38"
+  resolved "https://registry.npmjs.org/bitecs/-/bitecs-0.3.38.tgz"
+  integrity sha512-vfz6wjPElg/0O7c06Ttb/BeWMInBspSuekRvNoLqPyEZV87tLWipxqpjtGPKZBhin8jv4OuQkrkZZfZpaqOndQ==
+
 blueimp-md5@^2.10.0:
   version "2.19.0"
   resolved "https://registry.npmjs.org/blueimp-md5/-/blueimp-md5-2.19.0.tgz"
