@@ -3,11 +3,18 @@ import Phaser from "phaser";
 import testTile from "../assets/test-tile.png?url";
 import testChar from "../assets/test-char.png?url";
 import testDune from "../assets/test-dune.png?url";
+import testKlepsydra from "../assets/test-klepsydra.png?url";
+
+import klepsydraA from "../assets/klep-a.png?url";
+import klepsydraB from "../assets/klep-b.png?url";
 
 export const RESOURCES = {
   TEST_TILE: "test-tile",
   TEST_CHAR: "test-char",
   TEST_DUNE: "test-dune",
+  TEST_KLEPSYDRA: "test-klepsydra",
+  KLEPSYDRA_A: "klep-a",
+  KLEPSYDRA_B: "klep-b",
 } as const;
 
 export const RESOURCES_INDEX = Object.keys(RESOURCES).reduce(
@@ -28,6 +35,10 @@ export class SceneMain extends Phaser.Scene {
     this.load.image(RESOURCES.TEST_TILE, testTile);
     this.load.image(RESOURCES.TEST_CHAR, testChar);
     this.load.image(RESOURCES.TEST_DUNE, testDune);
+    this.load.image(RESOURCES.TEST_KLEPSYDRA, testKlepsydra);
+
+    this.load.image(RESOURCES.KLEPSYDRA_A, klepsydraA);
+    this.load.image(RESOURCES.KLEPSYDRA_B, klepsydraB);
   }
 
   create() {

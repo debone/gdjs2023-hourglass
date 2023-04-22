@@ -1,6 +1,6 @@
 import PhaserGamebus from "../gamebus";
 
-import Phaser, { Display } from "phaser";
+import Phaser from "phaser";
 import { IWorld, createWorld } from "bitecs";
 import createArcadeSpriteSystem, {
   arcadeSpriteById,
@@ -10,6 +10,9 @@ import { MapSystem } from "../systems/MapSystem";
 import { Player } from "../entities/player";
 import createKeyboardMovementSystem from "../systems/KeyboardMovementSystem";
 import { createSpriteSystem } from "../systems/SpriteSystem";
+import { SandFallingSystem } from "../systems/SandFallSystem";
+import { params } from "./debug";
+import Sand from "../components/Sand";
 
 export const tileSizeWidth = 64;
 export const tileSizeHeight = 32;
@@ -25,11 +28,12 @@ export class SceneWorld extends Phaser.Scene {
 
   declare cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
-  declare map: MapSystem;
-
   declare player: Player;
 
   declare world: IWorld;
+
+  declare map: MapSystem;
+  declare sandFallSystem: SandFallingSystem;
 
   declare spriteSystem: ReturnType<typeof createSpriteSystem>;
   declare arcadeSpriteSystem: ReturnType<typeof createArcadeSpriteSystem>;
@@ -62,11 +66,17 @@ export class SceneWorld extends Phaser.Scene {
     this.player = new Player(this, playerStartX, playerStartY);
 
     this.cameras.main.startFollow(arcadeSpriteById.get(this.player.id)!, true);
+    this.sandFallSystem = new SandFallingSystem(this);
   }
 
   update(_time: number) {
     this.arcadeSpriteSystem(this.world);
     this.movementSystem(this.world);
     this.keyboardMovementSystem(this.world);
+
+    this.map.update();
+
+    this.sandFallSystem.update();
+    params.sand = Sand.currentSand[this.player.id];
   }
 }

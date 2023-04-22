@@ -5,6 +5,18 @@ import { SceneWorld, tileSizeHeight, tileSizeWidth } from "./world";
 type Color = Display.Color;
 const Color = Display.Color;
 
+export const params = {
+  fps: 0,
+  tileCoord: { x: 50, y: 25 },
+  worldCoord: { x: 50, y: 25 },
+  debugCoord: { x: 0, y: 0 },
+  tile: 1,
+  sandTank: 1000,
+  water: 0,
+  stamina: 0,
+  sand: 0,
+};
+
 export class SceneDebug extends Phaser.Scene {
   declare pane: Pane;
   declare params: any;
@@ -18,25 +30,17 @@ export class SceneDebug extends Phaser.Scene {
   create(data: { sceneWorld: SceneWorld }) {
     this.sceneWorld = data.sceneWorld;
 
-    this.params = {
-      fps: 0,
-      tileCoord: { x: 50, y: 25 },
-      worldCoord: { x: 50, y: 25 },
-      tile: 1,
-      water: 0,
-      stamina: 0,
-      sand: 0,
-    };
-
     this.pane = new Pane();
-    this.pane.addMonitor(this.params, "fps");
-    this.pane.addInput(this.params, "tileCoord");
-    this.pane.addInput(this.params, "worldCoord");
-    this.pane.addInput(this.params, "tile");
+    this.pane.addMonitor(params, "fps");
+    this.pane.addInput(params, "tileCoord");
+    this.pane.addInput(params, "worldCoord");
+    this.pane.addInput(params, "debugCoord");
+    this.pane.addInput(params, "tile");
     this.pane.addSeparator();
-    this.pane.addInput(this.params, "water", { min: 0, max: 10 });
-    this.pane.addInput(this.params, "stamina", { min: 0, max: 10 });
-    this.pane.addInput(this.params, "sand", { min: 0, max: 100 });
+    this.pane.addMonitor(params, "sandTank");
+    /*this.pane.addInput(params, "water", { min: 0, max: 10 });
+    this.pane.addInput(params, "stamina", { min: 0, max: 10 });
+    this.pane.addInput(params, "sand", { min: 0, max: 100 });*/
 
     this.marker = this.sceneWorld.add.graphics();
   }
@@ -56,12 +60,16 @@ export class SceneDebug extends Phaser.Scene {
 
     if (pointerTile) {
       this.marker.clear();
+
+      /**
       this.drawMark(
         pointerTile.x,
         pointerTile.y,
         Color.IntegerToColor(0x9966ff),
         this.marker
       );
+      /**/
+
       // Snap to tile coordinates, but in world space
       //this.marker.x = worldCoord.x;
       //this.marker.y = worldCoord.y - tileFloorHeight[tileAt.index];
@@ -69,19 +77,19 @@ export class SceneDebug extends Phaser.Scene {
       //log(`mouse is at, ${worldCoord.x}, ${worldCoord.y}`);
       //debugEvery(500);
 
-      this.params.fps = this.game.loop.actualFps;
-      this.params.tileCoord.x = pointerTile.x;
-      this.params.tileCoord.y = pointerTile.y;
-      this.params.worldCoord.x = worldPoint.x;
-      this.params.worldCoord.y = worldPoint.y;
-      this.params.tile = this.sceneWorld.map.map.getTileAt(
+      params.fps = this.game.loop.actualFps;
+      params.tileCoord.x = pointerTile.x;
+      params.tileCoord.y = pointerTile.y;
+      params.worldCoord.x = worldPoint.x;
+      params.worldCoord.y = worldPoint.y;
+      params.tile = this.sceneWorld.map.map.getTileAt(
         Math.floor(pointerTile.x),
         Math.floor(pointerTile.y)
-      );
+      )?.index!;
 
-      this.params.water = this.sceneWorld.player.water;
-      this.params.stamina = this.sceneWorld.player.stamina;
-      this.params.sand = this.sceneWorld.player.sand;
+      params.water = this.sceneWorld.player.water;
+      params.stamina = this.sceneWorld.player.stamina;
+      //params.sand = this.sceneWorld.player.sand;
     }
 
     this.pane.refresh();
