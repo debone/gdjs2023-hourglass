@@ -8,7 +8,7 @@ import {
 
 //import Perlin from "phaser3-rex-plugins/plugins/perlin.js";
 import { RESOURCES } from "../scenes/preload";
-import SandDunesSystem from "./SandDunesSystem";
+import SandDunes, { createDuneSystem } from "./SandDunesSystem";
 
 export class MapSystem {
   tileWidth = tileSizeWidth;
@@ -16,7 +16,9 @@ export class MapSystem {
 
   map: Phaser.Tilemaps.Tilemap;
   mapData: Phaser.Tilemaps.MapData;
-  sandDuneSystem: SandDunesSystem;
+
+  sandDunes: SandDunes;
+  duneSystem: ReturnType<typeof createDuneSystem>;
 
   constructor(scene: SceneWorld) {
     this.mapData = new Phaser.Tilemaps.MapData({
@@ -39,7 +41,9 @@ export class MapSystem {
 
     layer?.fill(0, 0, 0, worldSize, worldSize);
 
-    this.sandDuneSystem = new SandDunesSystem(scene, layer!);
+    this.sandDunes = new SandDunes(scene, layer!);
+    this.duneSystem = createDuneSystem(scene);
+    this.duneSystem(scene.world);
 
     //this.generateMap(worldSize, 50);
 
@@ -49,8 +53,8 @@ export class MapSystem {
     //this.defineRoom(86, 137, 87, 138, -15);
   }
 
-  update() {
-    this.sandDuneSystem.update();
+  update(scene: SceneWorld) {
+    this.duneSystem(scene.world);
   }
 
   generateMap(width: number /*gradient: number*/) {

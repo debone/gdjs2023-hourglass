@@ -11,16 +11,14 @@ import { Player } from "../entities/player";
 import createKeyboardMovementSystem from "../systems/KeyboardMovementSystem";
 import { createSpriteSystem } from "../systems/SpriteSystem";
 import { SandFallingSystem } from "../systems/SandFallSystem";
-import { params } from "./debug";
-import Sand from "../components/Sand";
 
 export const tileSizeWidth = 64;
 export const tileSizeHeight = 32;
 
 export const worldSize = 512;
 
-export const playerStartX = 95;
-export const playerStartY = 35;
+export const playerStartX = Math.floor(worldSize / 2);
+export const playerStartY = Math.floor(worldSize / 2);
 
 export class SceneWorld extends Phaser.Scene {
   gamebus!: PhaserGamebus;
@@ -70,13 +68,12 @@ export class SceneWorld extends Phaser.Scene {
   }
 
   update(_time: number) {
+    this.map.update(this);
+
     this.arcadeSpriteSystem(this.world);
     this.movementSystem(this.world);
     this.keyboardMovementSystem(this.world);
 
-    this.map.update();
-
     this.sandFallSystem.update();
-    params.sand = Sand.currentSand[this.player.id];
   }
 }

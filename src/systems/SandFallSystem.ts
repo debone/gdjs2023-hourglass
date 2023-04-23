@@ -1,5 +1,5 @@
+import Sand from "../components/Sand";
 import { GAME_CONFIG } from "../consts";
-import { params } from "../scenes/debug";
 import { RESOURCES } from "../scenes/preload";
 import { SceneWorld } from "../scenes/world";
 
@@ -62,6 +62,9 @@ export class SandFallingSystem {
     maxTicks: 30,
   };
 
+  sandTankSpawnPoints: number[] = [];
+  sandTankCollectionPoints: number[] = [];
+
   constructor(scene: SceneWorld) {
     this.scene = scene;
 
@@ -77,6 +80,10 @@ export class SandFallingSystem {
       .get(RESOURCES.KLEPSYDRA_B)
       .getSourceImage() as HTMLImageElement;
 
+    const sandTank = scene.textures
+      .get(RESOURCES.SAND_TANK)
+      .getSourceImage() as HTMLImageElement;
+
     const klepsydra = scene.textures.createCanvas(
       "klepsydra",
       this.width,
@@ -87,6 +94,7 @@ export class SandFallingSystem {
 
     klepsydra?.draw(0, height - 74, klepA);
     klepsydra?.draw(64, height - 74, klepB);
+    klepsydra?.draw(336, height - 106, sandTank);
 
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
@@ -97,6 +105,10 @@ export class SandFallingSystem {
             this.sandWorld[x + y * this.width] = PIXEL_TYPE_CHOKE_A;
           } else if (pixel.green === 255) {
             this.sandWorld[x + y * this.width] = PIXEL_TYPE_CHOKE_B;
+          } else if (pixel.blue === 155) {
+            this.sandTankSpawnPoints.push(x + y * this.width);
+          } else if (pixel.blue === 255) {
+            this.sandTankCollectionPoints.push(x + y * this.width);
           } else {
             this.sandWorld[x + y * this.width] = PIXEL_TYPE_WALL;
           }
@@ -135,26 +147,68 @@ export class SandFallingSystem {
     // }
     /**/
 
-    if (this.scene.input.activePointer.isDown && params.sandTank > 0) {
+    //if ()
+
+    //if (Sand.normalSand)
+
+    this.iteration =
+      this.iteration === STEP_MARKER_EVEN ? STEP_MARKER_ODD : STEP_MARKER_EVEN;
+    this.nextIteration =
+      this.iteration === STEP_MARKER_EVEN ? STEP_MARKER_ODD : STEP_MARKER_EVEN;
+
+    if (Sand.isTankFilled[this.scene.player.id] > 0) {
+      let free = true;
+      for (let i = 0; i < this.sandTankSpawnPoints.length; i++) {
+        if (
+          this.sandWorld[this.sandTankSpawnPoints[i]] >> PIXEL_TYPE_SHIFT !==
+          PIXEL_TYPE_AIR_SHIFTED
+        ) {
+          free = false;
+          break;
+        }
+      }
+      if (free) {
+        Sand.isTankFilled[this.scene.player.id] = 0;
+      }
+    } else {
+      if (Sand.normalSand[this.scene.player.id] > 0) {
+        for (let i = 0; i < this.sandTankSpawnPoints.length; i++) {
+          if (
+            this.sandWorld[this.sandTankSpawnPoints[i]] >> PIXEL_TYPE_SHIFT ===
+            PIXEL_TYPE_AIR_SHIFTED
+          ) {
+            if (Sand.normalSand[this.scene.player.id] > 0) {
+              this.sandWorld[this.sandTankSpawnPoints[i]] =
+                SAND_TYPE_NORMAL |
+                (Phaser.Math.Between(0, 3) << 1) |
+                this.iteration;
+              Sand.normalSand[this.scene.player.id] -= 1;
+            }
+          } else {
+            Sand.isTankFilled[this.scene.player.id] = 1;
+            break;
+          }
+        }
+      }
+    }
+
+    if (this.scene.input.activePointer.isDown) {
       const x = Math.floor(this.scene.input.activePointer.x / 2);
       const y = this.width * Math.floor(this.scene.input.activePointer.y / 2);
       for (let i = 0; i < 3; i++) {
         if (
           this.sandWorld[x + i + y] >> PIXEL_TYPE_SHIFT ===
             PIXEL_TYPE_AIR_SHIFTED &&
-          params.sandTank > 0
+          this.sandWorld[this.sandTankCollectionPoints[i]] >>
+            PIXEL_TYPE_SHIFT !==
+            PIXEL_TYPE_AIR_SHIFTED
         ) {
           this.sandWorld[x + i + y] =
-            SAND_TYPE_NORMAL | (Phaser.Math.Between(0, 3) << 1);
-          params.sandTank -= 10;
+            this.sandWorld[this.sandTankCollectionPoints[i]];
+          this.sandWorld[this.sandTankCollectionPoints[i]] = PIXEL_TYPE_AIR;
         }
       }
     }
-
-    this.iteration =
-      this.iteration === STEP_MARKER_EVEN ? STEP_MARKER_ODD : STEP_MARKER_EVEN;
-    this.nextIteration =
-      this.iteration === STEP_MARKER_EVEN ? STEP_MARKER_ODD : STEP_MARKER_EVEN;
 
     let down = 0;
     let downLeft = 0;
@@ -167,7 +221,12 @@ export class SandFallingSystem {
 
     // Loop through this.sandWorld and move the sand down
     for (let loopY = this.height - 1; loopY >= 0; loopY--) {
-      for (let x = 0; x < this.width; x++) {
+      for (
+        let x = this.iteration > 0 ? 0 : this.width - 1;
+        (this.iteration > 0 && x < this.width) ||
+        (this.iteration === 0 && x >= 0);
+        x += this.iteration > 0 ? 1 : -1
+      ) {
         let y = this.width * loopY;
         curr = x + y;
 

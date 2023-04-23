@@ -32,8 +32,12 @@ export class Player {
     arcadeSpriteById.get(this.id)!.setPosition(x, y);
 
     addComponent(scene.world, Sand, this.id);
-    Sand.currentSand[this.id] = 0;
-    Sand.maxSand[this.id] = 100;
+    Sand.isTankFilled[this.id] = 0;
+    Sand.normalSand[this.id] = 0;
+    Sand.redSand[this.id] = 0;
+    Sand.blueSand[this.id] = 0;
+    //    Sand.currentSand[this.id] = 0;
+    //   Sand.maxSand[this.id] = 1000;
 
     //    this.sceneWorld = scene;
 

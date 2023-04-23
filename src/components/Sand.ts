@@ -1,8 +1,10 @@
 import { Types, defineComponent } from "bitecs";
 
 const Sand = defineComponent({
-  currentSand: Types.i32,
-  maxSand: Types.i32,
+  isTankFilled: Types.ui8,
+  normalSand: Types.i32,
+  redSand: Types.i32,
+  blueSand: Types.i32,
 });
 
 export default Sand;

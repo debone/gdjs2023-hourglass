@@ -1,6 +1,7 @@
 import { Display } from "phaser";
 import { Pane } from "tweakpane";
 import { SceneWorld, tileSizeHeight, tileSizeWidth } from "./world";
+import Sand from "../components/Sand";
 
 type Color = Display.Color;
 const Color = Display.Color;
@@ -12,9 +13,6 @@ export const params = {
   debugCoord: { x: 0, y: 0 },
   tile: 1,
   sandTank: 1000,
-  water: 0,
-  stamina: 0,
-  sand: 0,
 };
 
 export class SceneDebug extends Phaser.Scene {
@@ -87,9 +85,7 @@ export class SceneDebug extends Phaser.Scene {
         Math.floor(pointerTile.y)
       )?.index!;
 
-      params.water = this.sceneWorld.player.water;
-      params.stamina = this.sceneWorld.player.stamina;
-      //params.sand = this.sceneWorld.player.sand;
+      params.sandTank = Sand.normalSand[this.sceneWorld.player.id];
     }
 
     this.pane.refresh();
