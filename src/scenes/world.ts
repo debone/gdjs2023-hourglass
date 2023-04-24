@@ -9,7 +9,10 @@ import createMovementSystem from "../systems/MovementSystem";
 import { MapSystem } from "../systems/MapSystem";
 import { Player } from "../entities/player";
 import createKeyboardMovementSystem from "../systems/KeyboardMovementSystem";
-import { createSpriteSystem } from "../systems/SpriteSystem";
+import {
+  createUISpriteSystem,
+  createUIUpdateSpriteSystem,
+} from "../systems/UISpriteSystem";
 import { SandFallingSystem } from "../systems/SandFallSystem";
 
 export const tileSizeWidth = 64;
@@ -25,6 +28,10 @@ export class SceneWorld extends Phaser.Scene {
   bus!: Phaser.Events.EventEmitter;
 
   declare cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  declare keyW: Phaser.Input.Keyboard.Key;
+  declare keyA: Phaser.Input.Keyboard.Key;
+  declare keyS: Phaser.Input.Keyboard.Key;
+  declare keyD: Phaser.Input.Keyboard.Key;
 
   declare player: Player;
 
@@ -33,7 +40,8 @@ export class SceneWorld extends Phaser.Scene {
   declare map: MapSystem;
   declare sandFallSystem: SandFallingSystem;
 
-  declare spriteSystem: ReturnType<typeof createSpriteSystem>;
+  declare uiSpriteSystem: ReturnType<typeof createUISpriteSystem>;
+  declare uiUpdateSpriteSystem: ReturnType<typeof createUIUpdateSpriteSystem>;
   declare arcadeSpriteSystem: ReturnType<typeof createArcadeSpriteSystem>;
   declare movementSystem: ReturnType<typeof createMovementSystem>;
   declare keyboardMovementSystem: ReturnType<
@@ -53,13 +61,23 @@ export class SceneWorld extends Phaser.Scene {
     this.cameras.main.setDeadzone(200, 100);
     this.cursors = this.input.keyboard!.createCursorKeys();
 
+    this.keyW = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.W)!;
+    this.keyA = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.A)!;
+    this.keyS = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.S)!;
+    this.keyD = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.D)!;
+
     this.world = createWorld();
 
     this.map = new MapSystem(this);
     // create all the systems
+    this.uiSpriteSystem = createUISpriteSystem(this);
+    this.uiUpdateSpriteSystem = createUIUpdateSpriteSystem(this);
     this.arcadeSpriteSystem = createArcadeSpriteSystem(this);
     this.movementSystem = createMovementSystem();
-    this.keyboardMovementSystem = createKeyboardMovementSystem(this.cursors);
+    this.keyboardMovementSystem = createKeyboardMovementSystem(
+      this,
+      this.cursors
+    );
 
     this.player = new Player(this, playerStartX, playerStartY);
 
@@ -70,6 +88,8 @@ export class SceneWorld extends Phaser.Scene {
   update(_time: number) {
     this.map.update(this);
 
+    this.uiSpriteSystem(this.world);
+    this.uiUpdateSpriteSystem(this.world);
     this.arcadeSpriteSystem(this.world);
     this.movementSystem(this.world);
     this.keyboardMovementSystem(this.world);

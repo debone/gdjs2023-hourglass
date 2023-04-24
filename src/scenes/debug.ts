@@ -85,7 +85,7 @@ export class SceneDebug extends Phaser.Scene {
         Math.floor(pointerTile.y)
       )?.index!;
 
-      params.sandTank = Sand.normalSand[this.sceneWorld.player.id];
+      params.sandTank = Sand.size[this.sceneWorld.player.id];
     }
 
     this.pane.refresh();

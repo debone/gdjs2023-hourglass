@@ -1,9 +1,11 @@
+import ActiveKlepsydra from "../components/ActiveKlepsydra";
 import Sand from "../components/Sand";
 import { GAME_CONFIG } from "../consts";
 import { RESOURCES } from "../scenes/preload";
 import { SceneWorld } from "../scenes/world";
 
 //export const
+export const sandTankBuffer = new Uint8Array(25000);
 
 export const STEP_MARKER_MASK = 0b0000_0001;
 export const STEP_MARKER_EVEN = 0b0000_0000;
@@ -42,6 +44,8 @@ export class SandFallingSystem {
   scene: SceneWorld;
   graphics: Phaser.GameObjects.Graphics;
 
+  playerId: number;
+
   width = GAME_CONFIG.width / 2;
   height = GAME_CONFIG.height / 2;
 
@@ -62,11 +66,15 @@ export class SandFallingSystem {
     maxTicks: 30,
   };
 
+  klepASwapPoint!: { x: number; y: number };
+  klepBSwapPoint!: { x: number; y: number };
+
   sandTankSpawnPoints: number[] = [];
   sandTankCollectionPoints: number[] = [];
 
   constructor(scene: SceneWorld) {
     this.scene = scene;
+    this.playerId = this.scene.player.id;
 
     this.graphics = scene.add.graphics();
     this.graphics.setScrollFactor(0);
@@ -101,8 +109,12 @@ export class SandFallingSystem {
         //const pixel = scene.textures.getPixel(x, y, RESOURCES.TEST_KLEPSYDRA);
         const pixel = klepsydra?.getPixel(x, y);
         if (pixel && pixel.alpha > 0) {
-          if (pixel.red === 255) {
+          if (pixel.red === 155) {
+            this.klepASwapPoint = { x, y };
+          } else if (pixel.red === 255) {
             this.sandWorld[x + y * this.width] = PIXEL_TYPE_CHOKE_A;
+          } else if (pixel.green === 155) {
+            this.klepBSwapPoint = { x, y };
           } else if (pixel.green === 255) {
             this.sandWorld[x + y * this.width] = PIXEL_TYPE_CHOKE_B;
           } else if (pixel.blue === 155) {
@@ -115,6 +127,51 @@ export class SandFallingSystem {
         }
       }
     }
+
+    const keyR = scene.input.keyboard!.addKey("R");
+
+    keyR.on("up", () => {
+      let swapPoints;
+      if (ActiveKlepsydra.klepsydra[this.playerId] === 0) {
+        swapPoints = this.klepASwapPoint;
+      } else {
+        swapPoints = this.klepBSwapPoint;
+      }
+      let maxX = 29;
+      let maxY = 62;
+      let temp, futureX, futureY, by, bx;
+
+      // A loop where it mirrors the array of numbers on the x axis
+      for (let y = 0; y < maxY / 2 - 1; y++) {
+        for (let x = 0; x < maxX; x++) {
+          bx = x + swapPoints.x;
+          by = this.width * (y + swapPoints.y);
+
+          futureX = swapPoints.x + maxX - x - 1;
+          futureY = this.width * (swapPoints.y + maxY - y - 1);
+
+          temp = this.sandWorld[bx + by];
+          this.sandWorld[bx + by] = this.sandWorld[futureX + futureY];
+          this.sandWorld[futureX + futureY] = temp;
+        }
+      }
+
+      /*
+      for (let loopY = swapPoints.y, i =0; loopY < maxY + swapPoints.y; loopY++, i++) {
+        for (let x = swapPoints.x, j = 0; x < maxX + swapPoints.x; x++, j++) {
+          y = this.width * loopY;
+          curr = x + y;
+          if (this.sandWorld[curr] >> PIXEL_TYPE_SHIFT !==
+            PIXEL_TYPE_WALL_SHIFTED) {
+              futureX = x
+
+            temp = this.sandWorld[curr];
+            this.sandWorld[curr] = this.sandWorld[];
+            this
+          }
+        }
+      }*/
+    });
   }
 
   update() {
@@ -156,7 +213,7 @@ export class SandFallingSystem {
     this.nextIteration =
       this.iteration === STEP_MARKER_EVEN ? STEP_MARKER_ODD : STEP_MARKER_EVEN;
 
-    if (Sand.isTankFilled[this.scene.player.id] > 0) {
+    if (Sand.isTankFilled[this.playerId] > 0) {
       let free = true;
       for (let i = 0; i < this.sandTankSpawnPoints.length; i++) {
         if (
@@ -168,24 +225,33 @@ export class SandFallingSystem {
         }
       }
       if (free) {
-        Sand.isTankFilled[this.scene.player.id] = 0;
+        Sand.isTankFilled[this.playerId] = 0;
       }
     } else {
-      if (Sand.normalSand[this.scene.player.id] > 0) {
+      if (Sand.size[this.playerId] - Sand.pos[this.playerId] > 0) {
         for (let i = 0; i < this.sandTankSpawnPoints.length; i++) {
           if (
             this.sandWorld[this.sandTankSpawnPoints[i]] >> PIXEL_TYPE_SHIFT ===
             PIXEL_TYPE_AIR_SHIFTED
           ) {
-            if (Sand.normalSand[this.scene.player.id] > 0) {
-              this.sandWorld[this.sandTankSpawnPoints[i]] =
-                SAND_TYPE_NORMAL |
-                (Phaser.Math.Between(0, 3) << 1) |
-                this.iteration;
-              Sand.normalSand[this.scene.player.id] -= 1;
+            const sandType =
+              sandTankBuffer[Sand.pos[this.playerId]] === 3
+                ? SAND_TYPE_TANK
+                : sandTankBuffer[Sand.pos[this.playerId]] === 2
+                ? SAND_TYPE_HEALTH
+                : SAND_TYPE_NORMAL;
+
+            this.sandWorld[this.sandTankSpawnPoints[i]] =
+              sandType | (Phaser.Math.Between(0, 3) << 1) | this.iteration;
+            Sand.pos[this.playerId] += 1;
+
+            if (Sand.size[this.playerId] - Sand.pos[this.playerId] === 0) {
+              Sand.size[this.playerId] = 0;
+              Sand.pos[this.playerId] = 0;
+              break;
             }
           } else {
-            Sand.isTankFilled[this.scene.player.id] = 1;
+            Sand.isTankFilled[this.playerId] = 1;
             break;
           }
         }
@@ -296,7 +362,10 @@ export class SandFallingSystem {
           } else {
             if (this.chokeA.ticks > 0) {
               this.chokeA.ticks--;
-            } else {
+            } else if (
+              sw[x + y + this.width] >> PIXEL_TYPE_SHIFT ===
+              PIXEL_TYPE_AIR_SHIFTED
+            ) {
               sw[x + y + this.width] = this.chokeA.stored;
               this.chokeA.stored = 0;
             }
@@ -340,7 +409,10 @@ export class SandFallingSystem {
           } else {
             if (this.chokeB.ticks > 0) {
               this.chokeB.ticks--;
-            } else {
+            } else if (
+              sw[x + y + this.width] >> PIXEL_TYPE_SHIFT ===
+              PIXEL_TYPE_AIR_SHIFTED
+            ) {
               sw[x + y + this.width] = this.chokeB.stored;
               this.chokeB.stored = 0;
             }
@@ -431,6 +503,24 @@ export class SandFallingSystem {
 
         if (currentSandType === PIXEL_TYPE_WALL_SHIFTED) {
           this.graphics.fillStyle(0x00ffff, 1);
+          this.graphics.fillRect(x, y, 1, 1);
+        }
+
+        if (currentSandType === SAND_TYPE_TANK_SHIFTED) {
+          switch (
+            (this.sandWorld[x + this.width * y] & VARIANT_MASK) >>
+            VARIANT_SHIFT
+          ) {
+            case 2:
+              this.graphics.fillStyle(0x3859b3, 1);
+              break;
+            case 1:
+              this.graphics.fillStyle(0x3388de, 1);
+              break;
+            default:
+            case 0:
+              this.graphics.fillStyle(0x36c5f4, 1);
+          }
           this.graphics.fillRect(x, y, 1, 1);
         }
       }

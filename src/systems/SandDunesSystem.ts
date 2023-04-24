@@ -11,6 +11,7 @@ import Sand from "../components/Sand";
 import { arcadeSpriteById } from "./ArcadeSpriteSystem";
 import { params } from "../scenes/debug";
 import Dune from "../components/Dune";
+import { sandTankBuffer } from "./SandFallSystem";
 
 class SandDunes {
   scene: SceneWorld;
@@ -122,6 +123,7 @@ export const createDuneSystem = (scene: SceneWorld) => {
     }
 
     const brushRadius = 5;
+    let isOutsideDunes = true;
 
     if (
       scene.cursors.space.isDown &&
@@ -142,6 +144,8 @@ export const createDuneSystem = (scene: SceneWorld) => {
           continue;
         }
 
+        isOutsideDunes = false;
+
         const { canvas, rt } = duneGraphicsById.get(entityId)!;
 
         const relativeX = Math.floor(x - rt.x);
@@ -159,10 +163,23 @@ export const createDuneSystem = (scene: SceneWorld) => {
         // Loop over all the pixels array and make them transparent
         for (let y = 0; y < pixels.length; y += 1) {
           for (let x = 0; x < pixels[y].length; x += 1) {
+            if (Math.random() > 0.3) {
+              continue;
+            }
             if (pixels[y][x].color > 0) {
               canvas.setPixel(pixels[y][x].x, pixels[y][x].y, 0, 0, 0, 0);
 
-              Sand.normalSand[scene.player.id] += 1;
+              if (Math.random() > 0.1) {
+                continue;
+              }
+              sandTankBuffer[Sand.size[scene.player.id]] = 3;
+              Sand.size[scene.player.id] += 1;
+            } else {
+              if (Math.random() > 0.3) {
+                continue;
+              }
+              sandTankBuffer[Sand.size[scene.player.id]] = 1;
+              Sand.size[scene.player.id] += 1;
             }
           }
         }
@@ -171,6 +188,13 @@ export const createDuneSystem = (scene: SceneWorld) => {
 
         rt.clear();
         rt.draw(textureKey, 0, 0);
+      }
+
+      if (isOutsideDunes) {
+        for (let i = 0; i < 10; i++) {
+          sandTankBuffer[Sand.size[scene.player.id] + i] = 1;
+        }
+        Sand.size[scene.player.id] += 10;
       }
     }
 

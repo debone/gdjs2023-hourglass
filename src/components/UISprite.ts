@@ -1,7 +1,7 @@
 import { Types, defineComponent } from "bitecs";
 
-const Sprite = defineComponent({
+const UISprite = defineComponent({
   texture: Types.ui8,
 });
 
-export default Sprite;
+export default UISprite;

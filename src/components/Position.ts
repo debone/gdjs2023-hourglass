@@ -6,3 +6,5 @@ const Position = defineComponent({
 });
 
 export default Position;
+
+export const UpdatePosition = defineComponent();
