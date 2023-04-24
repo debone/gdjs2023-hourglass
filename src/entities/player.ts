@@ -1,5 +1,5 @@
 import { addEntity } from "bitecs";
-import { RESOURCES, RESOURCES_INDEX } from "../scenes/preload";
+import { RESOURCES_INDEX } from "../scenes/preload";
 import { SceneWorld } from "../scenes/world";
 import { addComponent } from "bitecs";
 import ArcadeSprite from "../components/ArcadeSprite";

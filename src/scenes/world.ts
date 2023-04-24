@@ -71,7 +71,7 @@ export class SceneWorld extends Phaser.Scene {
     this.map = new MapSystem(this);
     // create all the systems
     this.uiSpriteSystem = createUISpriteSystem(this);
-    this.uiUpdateSpriteSystem = createUIUpdateSpriteSystem(this);
+    this.uiUpdateSpriteSystem = createUIUpdateSpriteSystem();
     this.arcadeSpriteSystem = createArcadeSpriteSystem(this);
     this.movementSystem = createMovementSystem();
     this.keyboardMovementSystem = createKeyboardMovementSystem(

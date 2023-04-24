@@ -52,7 +52,7 @@ export const createUISpriteSystem = (scene: SceneWorld) => {
   });
 };
 
-export const createUIUpdateSpriteSystem = (scene: SceneWorld) => {
+export const createUIUpdateSpriteSystem = () => {
   const spriteQuery = defineQuery([UISprite, Position, UpdatePosition]);
   const spriteQueryEnter = enterQuery(spriteQuery);
   return defineSystem((world) => {
