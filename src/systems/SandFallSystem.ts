@@ -48,6 +48,9 @@ export const SAND_TYPE_NORMAL_SHIFTED = SAND_TYPE_NORMAL >> PIXEL_TYPE_SHIFT;
 export const SAND_TYPE_HEALTH_SHIFTED = SAND_TYPE_HEALTH >> PIXEL_TYPE_SHIFT;
 export const SAND_TYPE_TANK_SHIFTED = SAND_TYPE_TANK >> PIXEL_TYPE_SHIFT;
 
+const addEquip = 1;
+const addHealth = 2;
+
 export class SandFallingSystem {
   scene: SceneWorld;
   graphics: Phaser.GameObjects.Graphics;
@@ -112,10 +115,10 @@ export class SandFallingSystem {
 
     const { width, height } = klepsydra!;
 
-    klepsydra?.draw(0, height - 74, klepA);
-    klepsydra?.draw(12, height - 180, filter);
-    klepsydra?.draw(64, height - 74, klepB);
-    klepsydra?.draw(336, height - 106, sandTank);
+    klepsydra?.draw(0, height - 74 - 40, klepA);
+    klepsydra?.draw(12, height - 180 - 40, filter);
+    klepsydra?.draw(64, height - 74 - 40, klepB);
+    klepsydra?.draw(336, height - 106 - 60, sandTank);
 
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
@@ -123,7 +126,8 @@ export class SandFallingSystem {
         const pixel = klepsydra?.getPixel(x, y);
         if (pixel && pixel.alpha > 0) {
           if (pixel.red === 55) {
-            this.sandWorld[x + y * this.width] = SAND_TYPE_HEALTH;
+            this.sandWorld[x + y * this.width] =
+              SAND_TYPE_HEALTH | (Phaser.Math.Between(0, 3) << 1);
           } else if (pixel.red === 155) {
             this.klepASwapPoint = { x, y };
           } else if (pixel.red === 255) {
@@ -385,15 +389,19 @@ export class SandFallingSystem {
             if (this.chokeA.ticks > 0) {
               if (
                 this.chokeA.stored >> PIXEL_TYPE_SHIFT ===
-                SAND_TYPE_TANK_SHIFTED
+                  SAND_TYPE_TANK_SHIFTED &&
+                TickEquip.equip[this.scene.player.id] <
+                  TickEquip.maxEquip[this.scene.player.id]
               ) {
-                TickEquip.equip[this.scene.player.id] += 1;
+                TickEquip.equip[this.scene.player.id] += addEquip;
               }
               if (
                 this.chokeA.stored >> PIXEL_TYPE_SHIFT ===
-                SAND_TYPE_HEALTH_SHIFTED
+                  SAND_TYPE_HEALTH_SHIFTED &&
+                TickHealth.health[this.scene.player.id] <
+                  TickHealth.maxHealth[this.scene.player.id]
               ) {
-                TickHealth.health[this.scene.player.id] += 1;
+                TickHealth.health[this.scene.player.id] += addHealth;
               }
               this.chokeA.ticks--;
             } else if (
@@ -449,15 +457,19 @@ export class SandFallingSystem {
             if (this.chokeB.ticks > 0) {
               if (
                 this.chokeB.stored >> PIXEL_TYPE_SHIFT ===
-                SAND_TYPE_TANK_SHIFTED
+                  SAND_TYPE_TANK_SHIFTED &&
+                TickEquip.equip[this.scene.player.id] <
+                  TickEquip.maxEquip[this.scene.player.id]
               ) {
-                TickEquip.equip[this.scene.player.id] += 1;
+                TickEquip.equip[this.scene.player.id] += addEquip;
               }
               if (
                 this.chokeB.stored >> PIXEL_TYPE_SHIFT ===
-                SAND_TYPE_HEALTH_SHIFTED
+                  SAND_TYPE_HEALTH_SHIFTED &&
+                TickHealth.health[this.scene.player.id] <
+                  TickHealth.maxHealth[this.scene.player.id]
               ) {
-                TickHealth.health[this.scene.player.id] += 1;
+                TickHealth.health[this.scene.player.id] += addHealth;
               }
               this.chokeB.ticks--;
             } else if (
@@ -590,6 +602,24 @@ export class SandFallingSystem {
 
         if (currentSandType === PIXEL_TYPE_WALL_SHIFTED) {
           this.graphics.fillStyle(0x00ffff, 1);
+          this.graphics.fillRect(x, y, 1, 1);
+        }
+
+        if (currentSandType === SAND_TYPE_HEALTH_SHIFTED) {
+          switch (
+            (this.sandWorld[x + this.width * y] & VARIANT_MASK) >>
+            VARIANT_SHIFT
+          ) {
+            case 2:
+              this.graphics.fillStyle(0x6b2643, 1);
+              break;
+            case 1:
+              this.graphics.fillStyle(0xac2847, 1);
+              break;
+            default:
+            case 0:
+              this.graphics.fillStyle(0xec273f, 1);
+          }
           this.graphics.fillRect(x, y, 1, 1);
         }
 

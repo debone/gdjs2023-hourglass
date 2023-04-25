@@ -15,6 +15,7 @@ import {
 } from "../systems/UISpriteSystem";
 import { SandFallingSystem } from "../systems/SandFallSystem";
 import createTickEquipmentSystem from "../systems/TickEquipSystem";
+import TickHealth from "../components/TickHealth";
 
 export const tileSizeWidth = 64;
 export const tileSizeHeight = 32;
@@ -86,7 +87,11 @@ export class SceneWorld extends Phaser.Scene {
 
     this.cameras.main.startFollow(arcadeSpriteById.get(this.player.id)!, true);
     this.sandFallSystem = new SandFallingSystem(this);
+
+    this.healthBar = this.add.graphics().setScrollFactor(0);
   }
+
+  declare healthBar: Phaser.GameObjects.Graphics;
 
   update(_time: number) {
     this.map.update(this);
@@ -99,5 +104,38 @@ export class SceneWorld extends Phaser.Scene {
     this.tickEquipmentSystem(this.world);
 
     this.sandFallSystem.update();
+
+    this.healthBar.clear();
+    this.healthBar.fillStyle(0xac2847, 1);
+    this.healthBar.fillRect(
+      400,
+      10,
+      390 *
+        (TickHealth.health[this.player.id] /
+          TickHealth.maxHealth[this.player.id]),
+      20
+    );
+    this.healthBar.fillRect(
+      400 -
+        390 *
+          (TickHealth.health[this.player.id] /
+            TickHealth.maxHealth[this.player.id]),
+      10,
+
+      390 *
+        (TickHealth.health[this.player.id] /
+          TickHealth.maxHealth[this.player.id]),
+      20
+    );
+
+    if (TickHealth.health[this.player.id] === 0) {
+      this.add
+        .text(100, 100, "Thanks for playing", {
+          font: "5vw verdana",
+          color: "#ec273f",
+        })
+        .setScrollFactor(0);
+      this.game.pause();
+    }
   }
 }

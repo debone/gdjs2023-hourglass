@@ -10,6 +10,7 @@ import ActiveKlepsydra from "../components/ActiveKlepsydra";
 import UISprite from "../components/UISprite";
 import Position, { UpdatePosition } from "../components/Position";
 import TickEquip from "../components/TickEquip";
+import TickHealth from "../components/TickHealth";
 
 export class Player {
   declare id: number;
@@ -44,14 +45,18 @@ export class Player {
     TickEquip.equip[this.id] = 1;
     TickEquip.maxEquip[this.id] = 10;
 
+    addComponent(scene.world, TickHealth, this.id);
+    TickHealth.health[this.id] = 300;
+    TickHealth.maxHealth[this.id] = 300;
+
     const activeKlep = addEntity(scene.world);
 
     addComponent(scene.world, ActiveKlepsydra, this.id);
     ActiveKlepsydra.klepsydra[activeKlep] = 0;
 
     const klepPos = [
-      [64, 420],
-      [192, 420],
+      [104, 435],
+      [232, 435],
     ];
 
     addComponent(scene.world, UISprite, activeKlep);
