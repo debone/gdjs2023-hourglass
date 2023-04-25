@@ -5,6 +5,8 @@ import testChar from "../assets/test-char.png?url";
 import testDune from "../assets/test-dune.png?url";
 import testKlepsydra from "../assets/test-klepsydra.png?url";
 
+import filter from "../assets/filter.png?url";
+
 import klepsydraA from "../assets/klep-a.png?url";
 import klepsydraB from "../assets/klep-b.png?url";
 
@@ -21,6 +23,7 @@ export const RESOURCES = {
   KLEPSYDRA_B: "klep-b",
   SAND_TANK: "sand-tank",
   ARROW_DOWN: "arrow-down",
+  FILTER: "filter",
 } as const;
 
 export const RESOURCES_INDEX = Object.keys(RESOURCES).reduce(
@@ -49,6 +52,8 @@ export class SceneMain extends Phaser.Scene {
     this.load.image(RESOURCES.SAND_TANK, sandTank);
 
     this.load.image(RESOURCES.ARROW_DOWN, arrowDown);
+
+    this.load.image(RESOURCES.FILTER, filter);
   }
 
   create() {

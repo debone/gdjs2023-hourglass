@@ -23,6 +23,8 @@ export const PIXEL_TYPE_AIR = 0b0001_0000;
 export const PIXEL_TYPE_WALL = 0b0010_0000;
 export const PIXEL_TYPE_CHOKE_A = 0b0011_0000;
 export const PIXEL_TYPE_CHOKE_B = 0b0100_0000;
+export const PIXEL_TYPE_CHOKE_C = 0b0101_0000;
+export const PIXEL_TYPE_CHOKE_D = 0b0110_0000;
 
 export const PIXEL_TYPE_AIR_SHIFTED = PIXEL_TYPE_AIR >> PIXEL_TYPE_SHIFT;
 export const PIXEL_TYPE_WALL_SHIFTED = PIXEL_TYPE_WALL >> PIXEL_TYPE_SHIFT;
@@ -30,6 +32,10 @@ export const PIXEL_TYPE_CHOKE_A_SHIFTED =
   PIXEL_TYPE_CHOKE_A >> PIXEL_TYPE_SHIFT;
 export const PIXEL_TYPE_CHOKE_B_SHIFTED =
   PIXEL_TYPE_CHOKE_B >> PIXEL_TYPE_SHIFT;
+export const PIXEL_TYPE_CHOKE_C_SHIFTED =
+  PIXEL_TYPE_CHOKE_C >> PIXEL_TYPE_SHIFT;
+export const PIXEL_TYPE_CHOKE_D_SHIFTED =
+  PIXEL_TYPE_CHOKE_D >> PIXEL_TYPE_SHIFT;
 
 export const SAND_CHECK_MASK = 0b1000_0000;
 export const SAND_CHECK_SHIFT = 7;
@@ -94,6 +100,10 @@ export class SandFallingSystem {
       .get(RESOURCES.SAND_TANK)
       .getSourceImage() as HTMLImageElement;
 
+    const filter = scene.textures
+      .get(RESOURCES.FILTER)
+      .getSourceImage() as HTMLImageElement;
+
     const klepsydra = scene.textures.createCanvas(
       "klepsydra",
       this.width,
@@ -103,6 +113,7 @@ export class SandFallingSystem {
     const { width, height } = klepsydra!;
 
     klepsydra?.draw(0, height - 74, klepA);
+    klepsydra?.draw(12, height - 180, filter);
     klepsydra?.draw(64, height - 74, klepB);
     klepsydra?.draw(336, height - 106, sandTank);
 
@@ -117,6 +128,10 @@ export class SandFallingSystem {
             this.klepASwapPoint = { x, y };
           } else if (pixel.red === 255) {
             this.sandWorld[x + y * this.width] = PIXEL_TYPE_CHOKE_A;
+          } else if (pixel.green === 55) {
+            this.sandWorld[x + y * this.width] = PIXEL_TYPE_CHOKE_C;
+          } else if (pixel.green === 85) {
+            this.sandWorld[x + y * this.width] = PIXEL_TYPE_CHOKE_D;
           } else if (pixel.green === 155) {
             this.klepBSwapPoint = { x, y };
           } else if (pixel.green === 255) {
@@ -457,6 +472,37 @@ export class SandFallingSystem {
               }
               this.chokeB.stored = 0;
             }
+          }
+        }
+
+        if (sw[curr] >> PIXEL_TYPE_SHIFT === PIXEL_TYPE_CHOKE_C_SHIFTED) {
+          up = x + y - this.width;
+          upLeft = x + y - this.width - 1;
+          upRight = x + y - this.width + 1;
+          if (sw[up] >> PIXEL_TYPE_SHIFT === SAND_TYPE_NORMAL_SHIFTED) {
+            sw[upRight] = ((sw[up] >> 1) << 1) | this.nextIteration;
+
+            sw[up] = PIXEL_TYPE_AIR;
+            continue;
+          }
+        }
+
+        if (sw[curr] >> PIXEL_TYPE_SHIFT === PIXEL_TYPE_CHOKE_D_SHIFTED) {
+          up = x + y - this.width;
+          upLeft = x + y - this.width - 1;
+          upRight = x + y - this.width + 1;
+          if (sw[up] >> PIXEL_TYPE_SHIFT === SAND_TYPE_HEALTH_SHIFTED) {
+            sw[upLeft] = ((sw[up] >> 1) << 1) | this.nextIteration;
+
+            sw[up] = PIXEL_TYPE_AIR;
+            continue;
+          }
+
+          if (sw[up] >> PIXEL_TYPE_SHIFT === SAND_TYPE_TANK_SHIFTED) {
+            sw[upRight] = ((sw[up] >> 1) << 1) | this.nextIteration;
+
+            sw[up] = PIXEL_TYPE_AIR;
+            continue;
           }
         }
 
