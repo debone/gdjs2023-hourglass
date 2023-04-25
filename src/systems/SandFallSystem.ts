@@ -1,5 +1,7 @@
 import ActiveKlepsydra from "../components/ActiveKlepsydra";
 import Sand from "../components/Sand";
+import TickEquip from "../components/TickEquip";
+import TickHealth from "../components/TickHealth";
 import { GAME_CONFIG } from "../consts";
 import { RESOURCES } from "../scenes/preload";
 import { SceneWorld } from "../scenes/world";
@@ -57,7 +59,7 @@ export class SandFallingSystem {
   chokeA = {
     stored: 0,
     ticks: 0,
-    maxTicks: 100,
+    maxTicks: 30,
   };
 
   chokeB = {
@@ -109,7 +111,9 @@ export class SandFallingSystem {
         //const pixel = scene.textures.getPixel(x, y, RESOURCES.TEST_KLEPSYDRA);
         const pixel = klepsydra?.getPixel(x, y);
         if (pixel && pixel.alpha > 0) {
-          if (pixel.red === 155) {
+          if (pixel.red === 55) {
+            this.sandWorld[x + y * this.width] = SAND_TYPE_HEALTH;
+          } else if (pixel.red === 155) {
             this.klepASwapPoint = { x, y };
           } else if (pixel.red === 255) {
             this.sandWorld[x + y * this.width] = PIXEL_TYPE_CHOKE_A;
@@ -117,6 +121,9 @@ export class SandFallingSystem {
             this.klepBSwapPoint = { x, y };
           } else if (pixel.green === 255) {
             this.sandWorld[x + y * this.width] = PIXEL_TYPE_CHOKE_B;
+          } else if (pixel.blue === 55) {
+            this.sandWorld[x + y * this.width] =
+              SAND_TYPE_TANK | (Phaser.Math.Between(0, 3) << 1);
           } else if (pixel.blue === 155) {
             this.sandTankSpawnPoints.push(x + y * this.width);
           } else if (pixel.blue === 255) {
@@ -361,12 +368,29 @@ export class SandFallingSystem {
             }
           } else {
             if (this.chokeA.ticks > 0) {
+              if (
+                this.chokeA.stored >> PIXEL_TYPE_SHIFT ===
+                SAND_TYPE_TANK_SHIFTED
+              ) {
+                TickEquip.equip[this.scene.player.id] += 1;
+              }
+              if (
+                this.chokeA.stored >> PIXEL_TYPE_SHIFT ===
+                SAND_TYPE_HEALTH_SHIFTED
+              ) {
+                TickHealth.health[this.scene.player.id] += 1;
+              }
               this.chokeA.ticks--;
             } else if (
               sw[x + y + this.width] >> PIXEL_TYPE_SHIFT ===
               PIXEL_TYPE_AIR_SHIFTED
             ) {
-              sw[x + y + this.width] = this.chokeA.stored;
+              if ((this.chokeA.stored & VARIANT_MASK) >> VARIANT_SHIFT > 0) {
+                const nextVariant =
+                  ((this.chokeA.stored & VARIANT_MASK) >> VARIANT_SHIFT) - 1;
+                sw[x + y + this.width] =
+                  (this.chokeA.stored & ~VARIANT_MASK) | nextVariant;
+              }
               this.chokeA.stored = 0;
             }
           }
@@ -408,12 +432,29 @@ export class SandFallingSystem {
             }
           } else {
             if (this.chokeB.ticks > 0) {
+              if (
+                this.chokeB.stored >> PIXEL_TYPE_SHIFT ===
+                SAND_TYPE_TANK_SHIFTED
+              ) {
+                TickEquip.equip[this.scene.player.id] += 1;
+              }
+              if (
+                this.chokeB.stored >> PIXEL_TYPE_SHIFT ===
+                SAND_TYPE_HEALTH_SHIFTED
+              ) {
+                TickHealth.health[this.scene.player.id] += 1;
+              }
               this.chokeB.ticks--;
             } else if (
               sw[x + y + this.width] >> PIXEL_TYPE_SHIFT ===
               PIXEL_TYPE_AIR_SHIFTED
             ) {
-              sw[x + y + this.width] = this.chokeB.stored;
+              if ((this.chokeB.stored & VARIANT_MASK) >> VARIANT_SHIFT > 0) {
+                const nextVariant =
+                  ((this.chokeB.stored & VARIANT_MASK) >> VARIANT_SHIFT) - 1;
+                sw[x + y + this.width] =
+                  (this.chokeB.stored & ~VARIANT_MASK) | nextVariant;
+              }
               this.chokeB.stored = 0;
             }
           }

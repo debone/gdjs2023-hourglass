@@ -2,6 +2,7 @@ import { Display } from "phaser";
 import { Pane } from "tweakpane";
 import { SceneWorld, tileSizeHeight, tileSizeWidth } from "./world";
 import Sand from "../components/Sand";
+import TickEquip from "../components/TickEquip";
 
 type Color = Display.Color;
 const Color = Display.Color;
@@ -13,6 +14,8 @@ export const params = {
   debugCoord: { x: 0, y: 0 },
   tile: 1,
   sandTank: 1000,
+  equipTick: 0,
+  healthTick: 0,
 };
 
 export class SceneDebug extends Phaser.Scene {
@@ -36,6 +39,8 @@ export class SceneDebug extends Phaser.Scene {
     this.pane.addInput(params, "tile");
     this.pane.addSeparator();
     this.pane.addMonitor(params, "sandTank");
+    this.pane.addMonitor(params, "equipTick");
+    this.pane.addMonitor(params, "healthTick");
     /*this.pane.addInput(params, "water", { min: 0, max: 10 });
     this.pane.addInput(params, "stamina", { min: 0, max: 10 });
     this.pane.addInput(params, "sand", { min: 0, max: 100 });*/
@@ -86,6 +91,7 @@ export class SceneDebug extends Phaser.Scene {
       )?.index!;
 
       params.sandTank = Sand.size[this.sceneWorld.player.id];
+      params.equipTick = TickEquip.equip[this.sceneWorld.player.id];
     }
 
     this.pane.refresh();

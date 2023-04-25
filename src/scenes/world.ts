@@ -14,6 +14,7 @@ import {
   createUIUpdateSpriteSystem,
 } from "../systems/UISpriteSystem";
 import { SandFallingSystem } from "../systems/SandFallSystem";
+import createTickEquipmentSystem from "../systems/TickEquipSystem";
 
 export const tileSizeWidth = 64;
 export const tileSizeHeight = 32;
@@ -47,6 +48,7 @@ export class SceneWorld extends Phaser.Scene {
   declare keyboardMovementSystem: ReturnType<
     typeof createKeyboardMovementSystem
   >;
+  declare tickEquipmentSystem: ReturnType<typeof createTickEquipmentSystem>;
 
   constructor() {
     super({ key: "SceneWorld" });
@@ -78,6 +80,7 @@ export class SceneWorld extends Phaser.Scene {
       this,
       this.cursors
     );
+    this.tickEquipmentSystem = createTickEquipmentSystem();
 
     this.player = new Player(this, playerStartX, playerStartY);
 
@@ -93,6 +96,7 @@ export class SceneWorld extends Phaser.Scene {
     this.arcadeSpriteSystem(this.world);
     this.movementSystem(this.world);
     this.keyboardMovementSystem(this.world);
+    this.tickEquipmentSystem(this.world);
 
     this.sandFallSystem.update();
   }

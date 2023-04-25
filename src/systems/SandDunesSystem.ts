@@ -12,6 +12,7 @@ import { arcadeSpriteById } from "./ArcadeSpriteSystem";
 import { params } from "../scenes/debug";
 import Dune from "../components/Dune";
 import { sandTankBuffer } from "./SandFallSystem";
+import TickEquip from "../components/TickEquip";
 
 class SandDunes {
   scene: SceneWorld;
@@ -125,8 +126,11 @@ export const createDuneSystem = (scene: SceneWorld) => {
     const brushRadius = 5;
     let isOutsideDunes = true;
 
+    scene.cursors.space.isDown;
+
     if (
-      scene.cursors.space.isDown &&
+      scene.player &&
+      TickEquip.equip[scene.player.id] > 0 &&
       Sand.isTankFilled[scene.player.id] === 0
     ) {
       const duneEntities = duneQuery(world);

@@ -9,6 +9,7 @@ import Sand from "../components/Sand";
 import ActiveKlepsydra from "../components/ActiveKlepsydra";
 import UISprite from "../components/UISprite";
 import Position, { UpdatePosition } from "../components/Position";
+import TickEquip from "../components/TickEquip";
 
 export class Player {
   declare id: number;
@@ -38,6 +39,10 @@ export class Player {
     Sand.isTankFilled[this.id] = 0;
     Sand.size[this.id] = 0;
     Sand.pos[this.id] = 0;
+
+    addComponent(scene.world, TickEquip, this.id);
+    TickEquip.equip[this.id] = 1;
+    TickEquip.maxEquip[this.id] = 10;
 
     const activeKlep = addEntity(scene.world);
 
