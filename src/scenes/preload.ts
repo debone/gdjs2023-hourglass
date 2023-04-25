@@ -33,6 +33,8 @@ export const RESOURCES_INDEX = Object.keys(RESOURCES).reduce(
 
 export const RESOURCES_LIST = Object.values(RESOURCES);
 
+declare var WebFont: any;
+
 export class SceneMain extends Phaser.Scene {
   declare keySpace: Phaser.Input.Keyboard.Key;
 
@@ -54,12 +56,18 @@ export class SceneMain extends Phaser.Scene {
     this.load.image(RESOURCES.ARROW_DOWN, arrowDown);
 
     this.load.image(RESOURCES.FILTER, filter);
+
+    this.load.script(
+      "webfont",
+      "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
+    );
   }
 
   create() {
-    this.add.text(100, 100, "Main", {
-      font: "15vw verdana",
-      color: "white",
+    WebFont.load({
+      google: {
+        families: ["Alkalami"],
+      },
     });
 
     this.keySpace = this.input.keyboard!.addKey("SPACE");

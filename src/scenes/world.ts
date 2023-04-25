@@ -89,7 +89,27 @@ export class SceneWorld extends Phaser.Scene {
     this.sandFallSystem = new SandFallingSystem(this);
 
     this.healthBar = this.add.graphics().setScrollFactor(0);
+
+    this.countup = this.add
+      .text(20, 500, "", {
+        font: "5vw Alkalami",
+        color: "#ec273f",
+      })
+      .setScrollFactor(0);
+
+    this.t = 0;
+    this.time.addEvent({
+      delay: 1000, // ms
+      callback: () => {
+        this.t++;
+        this.countup.setText(this.t.toString());
+      },
+      loop: true,
+    });
   }
+
+  declare t: number;
+  declare countup: Phaser.GameObjects.Text;
 
   declare healthBar: Phaser.GameObjects.Graphics;
 
@@ -130,8 +150,10 @@ export class SceneWorld extends Phaser.Scene {
 
     if (TickHealth.health[this.player.id] === 0) {
       this.add
-        .text(100, 100, "Thanks for playing", {
-          font: "5vw verdana",
+        .text(190, 100, ["Thanks for playing!", `You survived ${this.t}s`], {
+          fontFamily: "Alkalami",
+          fontSize: "4vw",
+          align: "center",
           color: "#ec273f",
         })
         .setScrollFactor(0);
