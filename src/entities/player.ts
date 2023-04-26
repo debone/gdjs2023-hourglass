@@ -1,5 +1,5 @@
 import { addEntity } from "bitecs";
-import { RESOURCES_INDEX } from "../scenes/preload";
+import { RESOURCES, RESOURCES_INDEX } from "../scenes/preload";
 import { SceneWorld } from "../scenes/world";
 import { addComponent } from "bitecs";
 import ArcadeSprite from "../components/ArcadeSprite";
@@ -29,12 +29,42 @@ export class Player {
     addComponent(scene.world, KeyboardControl, this.id);
 
     addComponent(scene.world, ArcadeSprite, this.id);
-    ArcadeSprite.texture[this.id] = RESOURCES_INDEX.TEST_CHAR;
+    ArcadeSprite.texture[this.id] = RESOURCES_INDEX.PLAYER_IMAGE;
+    /*
+    scene.anims.create({
+      key: "walk",
+      frames: scene.anims.generateFrameNumbers(RESOURCES.PLAYER_IMAGE, {
+        start: 0,
+        end: 3,
+      }),
+      duration: 1,
+      frameRate: 12,
+      repeat: -1,
+    });
+*/
+    scene.anims.create({
+      key: "still",
+      frames: "player-image",
+      frameRate: 8,
+      repeat: -1,
+    });
 
     scene.arcadeSpriteSystem(scene.world);
 
     const { x, y } = scene.map.map.tileToWorldXY(posX, posY)!;
     arcadeSpriteById.get(this.id)!.setPosition(x, y);
+
+    /*scene.anims.create({
+      key: "still",
+      frames: scene.anims.generateFrameNumbers(RESOURCES.PLAYER_IMAGE, {
+        start: 4,
+        end: 4,
+      }),
+      frameRate: 0,
+      repeat: -1,
+    });*/
+
+    //arcadeSpriteById.get(this.id)!.play("walk", true);
 
     addComponent(scene.world, Sand, this.id);
     Sand.isTankFilled[this.id] = 0;

@@ -3,7 +3,10 @@ import { SceneWorld } from "../scenes/world";
 import { RESOURCES_LIST } from "../scenes/preload";
 import ArcadeSprite from "../components/ArcadeSprite";
 
-export const arcadeSpriteById = new Map<number, Phaser.Physics.Arcade.Sprite>();
+export const arcadeSpriteById = new Map<
+  number,
+  Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+>();
 
 const createArcadeSpriteSystem = (scene: SceneWorld) => {
   const spriteQuery = defineQuery([ArcadeSprite]);
@@ -16,6 +19,9 @@ const createArcadeSpriteSystem = (scene: SceneWorld) => {
       const entityId = enterEntities[i];
       const textureId = ArcadeSprite.texture[entityId];
       const sprite = scene.physics.add.sprite(0, 0, RESOURCES_LIST[textureId]);
+
+      sprite.setScale(2);
+
       arcadeSpriteById.set(entityId, sprite);
     }
 

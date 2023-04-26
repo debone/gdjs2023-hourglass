@@ -18,6 +18,21 @@ const createKeyboardMovementSystem = (
 
       body.setVelocity(0);
 
+      if (
+        cursors.left.isDown ||
+        scene.keyA.isDown ||
+        cursors.right.isDown ||
+        scene.keyD.isDown ||
+        cursors.up.isDown ||
+        scene.keyW.isDown ||
+        cursors.down.isDown ||
+        scene.keyS.isDown
+      ) {
+        body.play("still", true);
+      } else {
+        body.stop(0);
+      }
+
       if (cursors.left.isDown || scene.keyA.isDown) {
         body.setVelocityX(-100);
       } else if (cursors.right.isDown || scene.keyD.isDown) {
@@ -28,6 +43,15 @@ const createKeyboardMovementSystem = (
         body.setVelocityY(-100);
       } else if (cursors.down.isDown || scene.keyS.isDown) {
         body.setVelocityY(100);
+      }
+
+      const { x } = body.body.velocity;
+
+      if (x < 0) {
+        body.flipX = 1;
+      } else if (x > 0) {
+        body.flipX = 0;
+        //this.dragon.play("right", true);
       }
     }
 

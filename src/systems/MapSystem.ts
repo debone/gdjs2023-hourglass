@@ -37,9 +37,24 @@ export class MapSystem {
       RESOURCES.TEST_TILE
     );
 
+    const dune = this.map.addTilesetImage(
+      "iso-64x64-osutside",
+      RESOURCES.TILE_TWO
+    );
+
     const layer = this.map.createBlankLayer("layer", tileset!, 0, 0);
 
-    layer?.fill(0, 0, 0, worldSize, worldSize);
+    //layer?.fill(1, 0, 0, worldSize, worldSize);
+    layer?.weightedRandomize(
+      [
+        { index: 0, weight: 10 },
+        { index: 1, weight: 1 },
+      ],
+      0,
+      0,
+      worldSize,
+      worldSize
+    );
 
     this.sandDunes = new SandDunes(scene, layer!);
     this.duneSystem = createDuneSystem(scene);

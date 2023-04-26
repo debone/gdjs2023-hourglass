@@ -1,8 +1,11 @@
 import Phaser from "phaser";
 
 import testTile from "../assets/test-tile.png?url";
+import tileTwo from "../assets/tile-two.png?url";
 import testChar from "../assets/test-char.png?url";
 import testDune from "../assets/test-dune.png?url";
+import duneRed from "../assets/dune-red.png?url";
+import duneBlue from "../assets/dune-blue.png?url";
 import testKlepsydra from "../assets/test-klepsydra.png?url";
 
 import filter from "../assets/filter.png?url";
@@ -14,8 +17,12 @@ import sandTank from "../assets/sandtank.png?url";
 
 import arrowDown from "../assets/arrow-down.png?url";
 
+import playerImage from "../assets/char.png?url";
+import playerJson from "../assets/char.json?url";
+
 export const RESOURCES = {
   TEST_TILE: "test-tile",
+  TILE_TWO: "tile-two",
   TEST_CHAR: "test-char",
   TEST_DUNE: "test-dune",
   TEST_KLEPSYDRA: "test-klepsydra",
@@ -24,6 +31,10 @@ export const RESOURCES = {
   SAND_TANK: "sand-tank",
   ARROW_DOWN: "arrow-down",
   FILTER: "filter",
+  PLAYER_IMAGE: "player-image",
+  PLAYER_JSON: "player-json",
+  DUNE_BLUE: "dune-blue",
+  DUNE_RED: "dune-red",
 } as const;
 
 export const RESOURCES_INDEX = Object.keys(RESOURCES).reduce(
@@ -44,8 +55,13 @@ export class SceneMain extends Phaser.Scene {
 
   preload() {
     this.load.image(RESOURCES.TEST_TILE, testTile);
+    this.load.image(RESOURCES.TILE_TWO, tileTwo);
     this.load.image(RESOURCES.TEST_CHAR, testChar);
     this.load.image(RESOURCES.TEST_DUNE, testDune);
+
+    this.load.image(RESOURCES.DUNE_BLUE, duneBlue);
+    this.load.image(RESOURCES.DUNE_RED, duneRed);
+
     this.load.image(RESOURCES.TEST_KLEPSYDRA, testKlepsydra);
 
     this.load.image(RESOURCES.KLEPSYDRA_A, klepsydraA);
@@ -56,6 +72,8 @@ export class SceneMain extends Phaser.Scene {
     this.load.image(RESOURCES.ARROW_DOWN, arrowDown);
 
     this.load.image(RESOURCES.FILTER, filter);
+
+    this.load.aseprite(RESOURCES.PLAYER_IMAGE, playerImage, playerJson);
 
     this.load.script(
       "webfont",

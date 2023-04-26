@@ -16,7 +16,7 @@ export default function createTickEquipmentSystem() {
     }
 
     {
-      const entities = query(world);
+      const entities = query2(world);
       for (let i = 0; i < entities.length; i++) {
         const entity = entities[i];
         TickHealth.health[entity] > 0 && (TickHealth.health[entity] -= 1);
