@@ -30,7 +30,7 @@ const createKeyboardMovementSystem = (
       ) {
         body.play("still", true);
       } else {
-        body.stop(0);
+        body.stop();
       }
 
       if (cursors.left.isDown || scene.keyA.isDown) {
@@ -48,9 +48,9 @@ const createKeyboardMovementSystem = (
       const { x } = body.body.velocity;
 
       if (x < 0) {
-        body.flipX = 1;
+        body.flipX = true;
       } else if (x > 0) {
-        body.flipX = 0;
+        body.flipX = false;
         //this.dragon.play("right", true);
       }
     }

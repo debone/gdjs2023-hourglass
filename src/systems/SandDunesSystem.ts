@@ -36,7 +36,7 @@ class SandDunes {
     const dune1_entity = addEntity(scene.world);
 
     addComponent(scene.world, Dune, dune1_entity);
-    Dune.texture[dune1_entity] = RESOURCES_INDEX.TEST_DUNE;
+    Dune.texture[dune1_entity] = RESOURCES_INDEX.DUNE_BLUE;
     Dune.x[dune1_entity] = x;
     Dune.y[dune1_entity] = y;
 
@@ -48,7 +48,7 @@ class SandDunes {
     const dune2_entity = addEntity(scene.world);
 
     addComponent(scene.world, Dune, dune2_entity);
-    Dune.texture[dune2_entity] = RESOURCES_INDEX.TEST_DUNE;
+    Dune.texture[dune2_entity] = RESOURCES_INDEX.DUNE_RED;
     Dune.x[dune2_entity] = x2;
     Dune.y[dune2_entity] = y2;
 
@@ -61,7 +61,10 @@ class SandDunes {
       const dune_entity = addEntity(scene.world);
 
       addComponent(scene.world, Dune, dune_entity);
-      Dune.texture[dune_entity] = RESOURCES_INDEX.TEST_DUNE;
+      Dune.texture[dune_entity] =
+        Math.random() > 0.5
+          ? RESOURCES_INDEX.DUNE_BLUE
+          : RESOURCES_INDEX.DUNE_RED;
       Dune.x[dune_entity] = x;
       Dune.y[dune_entity] = y;
     }
@@ -170,7 +173,19 @@ export const createDuneSystem = (scene: SceneWorld) => {
             if (Math.random() > 0.3) {
               continue;
             }
-            if (pixels[y][x].color > 0) {
+            if (
+              pixels[y][x].color >> 16 === 121 ||
+              pixels[y][x].color >> 16 === 167 ||
+              pixels[y][x].color >> 16 === 203
+            ) {
+              canvas.setPixel(pixels[y][x].x, pixels[y][x].y, 0, 0, 0, 0);
+
+              if (Math.random() > 0.1) {
+                continue;
+              }
+              sandTankBuffer[Sand.size[scene.player.id]] = 2;
+              Sand.size[scene.player.id] += 1;
+            } else if (pixels[y][x].color > 0) {
               canvas.setPixel(pixels[y][x].x, pixels[y][x].y, 0, 0, 0, 0);
 
               if (Math.random() > 0.1) {

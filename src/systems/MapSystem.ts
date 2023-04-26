@@ -37,11 +37,6 @@ export class MapSystem {
       RESOURCES.TEST_TILE
     );
 
-    const dune = this.map.addTilesetImage(
-      "iso-64x64-osutside",
-      RESOURCES.TILE_TWO
-    );
-
     const layer = this.map.createBlankLayer("layer", tileset!, 0, 0);
 
     //layer?.fill(1, 0, 0, worldSize, worldSize);

@@ -287,17 +287,27 @@ export class SandFallingSystem {
     if (this.scene.input.activePointer.isDown) {
       const x = Math.floor(this.scene.input.activePointer.x / 2);
       const y = this.width * Math.floor(this.scene.input.activePointer.y / 2);
-      for (let i = 0; i < 3; i++) {
-        if (
-          this.sandWorld[x + i + y] >> PIXEL_TYPE_SHIFT ===
-            PIXEL_TYPE_AIR_SHIFTED &&
-          this.sandWorld[this.sandTankCollectionPoints[i]] >>
-            PIXEL_TYPE_SHIFT !==
-            PIXEL_TYPE_AIR_SHIFTED
-        ) {
-          this.sandWorld[x + i + y] =
-            this.sandWorld[this.sandTankCollectionPoints[i]];
-          this.sandWorld[this.sandTankCollectionPoints[i]] = PIXEL_TYPE_AIR;
+
+      if (
+        Sand.isTankFilled[this.playerId] === 0 &&
+        this.sandWorld[x + y] >> SAND_CHECK_SHIFT === 1
+      ) {
+        this.sandWorld[this.sandTankSpawnPoints[6]] =
+          ((this.sandWorld[x + y] >> 1) << 1) | this.iteration;
+        this.sandWorld[x + y] = PIXEL_TYPE_AIR;
+      } else {
+        for (let i = 0; i < 3; i++) {
+          if (
+            this.sandWorld[x + i + y] >> PIXEL_TYPE_SHIFT ===
+              PIXEL_TYPE_AIR_SHIFTED &&
+            this.sandWorld[this.sandTankCollectionPoints[i]] >>
+              PIXEL_TYPE_SHIFT !==
+              PIXEL_TYPE_AIR_SHIFTED
+          ) {
+            this.sandWorld[x + i + y] =
+              this.sandWorld[this.sandTankCollectionPoints[i]];
+            this.sandWorld[this.sandTankCollectionPoints[i]] = PIXEL_TYPE_AIR;
+          }
         }
       }
     }
@@ -601,7 +611,7 @@ export class SandFallingSystem {
         }
 
         if (currentSandType === PIXEL_TYPE_WALL_SHIFTED) {
-          this.graphics.fillStyle(0x00ffff, 1);
+          this.graphics.fillStyle(0x734c44, 1);
           this.graphics.fillRect(x, y, 1, 1);
         }
 

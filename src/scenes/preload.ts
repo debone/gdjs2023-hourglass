@@ -16,6 +16,9 @@ import klepsydraB from "../assets/klep-b.png?url";
 import sandTank from "../assets/sandtank.png?url";
 
 import arrowDown from "../assets/arrow-down.png?url";
+import one from "../assets/one.png?url";
+import two from "../assets/two.png?url";
+import mouse from "../assets/mouse.png?url";
 
 import playerImage from "../assets/char.png?url";
 import playerJson from "../assets/char.json?url";
@@ -30,6 +33,9 @@ export const RESOURCES = {
   KLEPSYDRA_B: "klep-b",
   SAND_TANK: "sand-tank",
   ARROW_DOWN: "arrow-down",
+  ONE: "one",
+  TWO: "two",
+  MOUSE: "mouse",
   FILTER: "filter",
   PLAYER_IMAGE: "player-image",
   PLAYER_JSON: "player-json",
@@ -70,6 +76,9 @@ export class SceneMain extends Phaser.Scene {
     this.load.image(RESOURCES.SAND_TANK, sandTank);
 
     this.load.image(RESOURCES.ARROW_DOWN, arrowDown);
+    this.load.image(RESOURCES.MOUSE, mouse);
+    this.load.image(RESOURCES.ONE, one);
+    this.load.image(RESOURCES.TWO, two);
 
     this.load.image(RESOURCES.FILTER, filter);
 
@@ -86,22 +95,32 @@ export class SceneMain extends Phaser.Scene {
       google: {
         families: ["Alkalami"],
       },
+      active: () => {
+        this.add
+          .text(100, 200, "Sands of time", {
+            fontFamily: "Alkalami",
+            fontSize: "100px",
+            color: "#ffffff",
+          })
+          .setShadow(2, 2, "#333333", 2, false, true);
+        this.add
+          .text(260, 320, "Press space to start", {
+            fontFamily: "Alkalami",
+            fontSize: "32px",
+            color: "#ffffff",
+          })
+          .setShadow(2, 2, "#333333", 2, false, true);
+      },
     });
 
     this.keySpace = this.input.keyboard!.addKey("SPACE");
-    this.scene.transition({
-      target: "SceneWorld",
-      duration: 0, //2000,
-      moveBelow: true,
-    });
   }
 
   update(/*time, delta*/) {
     if (Phaser.Input.Keyboard.JustDown(this.keySpace)) {
       this.scene.transition({
         target: "SceneWorld",
-        duration: 0, //2000,
-        moveBelow: true,
+        duration: 2000,
       });
     }
   }

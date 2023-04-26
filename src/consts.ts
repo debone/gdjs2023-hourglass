@@ -20,14 +20,14 @@ export const GAME_CONFIG = {
   },
   width: 800,
   height: 600,
-  backgroundColor: COLORS[0],
+  backgroundColor: 0xac2847,
   pixelArt: true,
   //"render.transparent": true,
   parent: "game-container",
   physics: {
     default: "arcade",
     arcade: {
-      debug: true,
+      debug: false,
     },
   },
 };

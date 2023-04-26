@@ -1,5 +1,5 @@
 import { addEntity } from "bitecs";
-import { RESOURCES, RESOURCES_INDEX } from "../scenes/preload";
+import { RESOURCES_INDEX } from "../scenes/preload";
 import { SceneWorld } from "../scenes/world";
 import { addComponent } from "bitecs";
 import ArcadeSprite from "../components/ArcadeSprite";
@@ -76,7 +76,7 @@ export class Player {
     TickEquip.maxEquip[this.id] = 10;
 
     addComponent(scene.world, TickHealth, this.id);
-    TickHealth.health[this.id] = 300;
+    TickHealth.health[this.id] = 150;
     TickHealth.maxHealth[this.id] = 300;
 
     const activeKlep = addEntity(scene.world);

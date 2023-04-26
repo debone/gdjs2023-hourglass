@@ -16,6 +16,7 @@ import {
 import { SandFallingSystem } from "../systems/SandFallSystem";
 import createTickEquipmentSystem from "../systems/TickEquipSystem";
 import TickHealth from "../components/TickHealth";
+import { RESOURCES } from "./preload";
 
 export const tileSizeWidth = 64;
 export const tileSizeHeight = 32;
@@ -56,7 +57,7 @@ export class SceneWorld extends Phaser.Scene {
   }
 
   create() {
-    this.scene.run("SceneDebug", { sceneWorld: this });
+    //this.scene.run("SceneDebug", { sceneWorld: this });
 
     this.bus = this.gamebus.getBus();
 
@@ -91,8 +92,8 @@ export class SceneWorld extends Phaser.Scene {
     this.healthBar = this.add.graphics().setScrollFactor(0);
 
     this.countup = this.add
-      .text(20, 500, "", {
-        font: "5vw Alkalami",
+      .text(20, 550, "", {
+        font: "48px Alkalami",
         color: "#ec273f",
       })
       .setScrollFactor(0);
@@ -106,6 +107,10 @@ export class SceneWorld extends Phaser.Scene {
       },
       loop: true,
     });
+
+    this.add.sprite(62, 520, RESOURCES.ONE).setScrollFactor(0);
+    this.add.sprite(193, 520, RESOURCES.TWO).setScrollFactor(0);
+    this.add.sprite(740, 480, RESOURCES.MOUSE).setScrollFactor(0);
   }
 
   declare t: number;
@@ -150,9 +155,9 @@ export class SceneWorld extends Phaser.Scene {
 
     if (TickHealth.health[this.player.id] === 0) {
       this.add
-        .text(190, 100, ["Thanks for playing!", `You survived ${this.t}s`], {
+        .text(250, 100, ["Thanks for playing!", `You survived ${this.t}s`], {
           fontFamily: "Alkalami",
-          fontSize: "4vw",
+          fontSize: "36px",
           align: "center",
           color: "#ec273f",
         })
